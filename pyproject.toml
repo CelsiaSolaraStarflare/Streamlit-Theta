@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "streamlit-theta"
+version = "1.0.3"
+description = "Comprehensive visual editors suite for Streamlit: presentations, documents, spreadsheets, charts, images, forms, mind maps, diagrams, newsletters, and more. Professional-grade editing tools for modern web applications."
+readme = "README.md"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "CelsiaSolaraStarflare", email = "celsiastarflare@outlook.com"}
+]
+keywords = ["streamlit", "editor", "visual", "presentation", "document", "spreadsheet", "chart", "image", "form", "mindmap", "diagram", "newsletter", "drag-drop", "wysiwyg", "open-source"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers", 
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8", 
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Office/Business :: Financial :: Spreadsheet",
+    "Topic :: Multimedia :: Graphics :: Presentation",
+]
+requires-python = ">=3.7"
+dependencies = [
+    "streamlit>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/CelsiaSolaraStarflare/streamlit-theta"
+"Bug Reports" = "https://github.com/CelsiaSolaraStarflare/streamlit-theta/issues"
+Source = "https://github.com/CelsiaSolaraStarflare/streamlit-theta"
+
+[tool.setuptools.packages.find]
+include = ["streamlit_theta*"]
+exclude = ["IDXDB*", "__pycache__*", "generated*", "plugin*", "*.pyc","WORKFLOW_SETUP.md"]
+
+[tool.setuptools.package-data]
+streamlit_theta = ["*.py"]

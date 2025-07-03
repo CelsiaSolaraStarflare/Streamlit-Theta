@@ -1,2 +1,579 @@
-# Streamlit-Theta
-Editor suite for documents, presentations, spreadsheets, and custom modules.
+# 🎨 Streamlit Theta - Open Source Visual Editors Suite for Streamlit
+
+[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
+[![Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.0+-red.svg)](https://streamlit.io/)
+
+**Open source Streamlit Editor suite for documents, presentations, spreadsheets, and custom modules. Enhance your Streamlit apps with visual editing tools.**
+
+Streamlit Theta provides twelve powerful, interactive visual editors that bring modern editing experiences directly to your web applications. Create presentations, documents, spreadsheets, charts, images, forms, mind maps, diagrams, newsletters, and more with intuitive drag-and-drop interfaces and flexible formatting tools.
+
+> 🎉 **Version 1.0.0** - Fully functional with complete download functionality! All editors are production-ready and tested.
+
+## ✨ Features
+
+🎯 **Slide Editor** - Visual presentation editor  
+📝 **Word Editor** - Document editor with rich formatting  
+📊 **Spreadsheet Editor** - Full-featured spreadsheet with formulas and cell navigation  
+📋 **CSV Editor** - Data table editor with import/export functionality  
+🎵 **Audio Editor** - Audio player with effects and playback controls  
+🎬 **Video Editor** - Video player with filters, effects, and timeline controls  
+📈 **Chart Editor** - Interactive chart and graph creation tool  
+🖼️ **Image Editor** - Image manipulation and editing suite  
+📝 **Form Builder** - Drag-and-drop form creation tool  
+🧠 **Mind Map Editor** - Visual mind mapping and brainstorming tool  
+📐 **Diagram Editor** - Flowchart and diagram creation tool  
+📧 **Newsletter Editor** - Email and newsletter design tool  
+
+### 🚀 Key Capabilities
+
+- **Modern UI/UX** - Clean, intuitive interfaces
+- **Real-time Editing** - Instant visual feedback and live updates
+- **File Downloads** - Save work directly to your computer in standard formats
+- **Drag & Drop** - Intuitive element manipulation (slides, text, etc.)
+- **Rich Formatting** - Comprehensive text styling and layout options
+- **Cross-Platform** - Works on Windows, Mac, and Linux
+- **Mobile Responsive** - Adapts to different screen sizes
+
+## 📦 Installation
+
+### Via pip (when published)
+```bash
+pip install streamlit-theta
+```
+
+### From source
+```bash
+git clone https://github.com/your-repo/streamlit-theta
+cd streamlit-theta
+pip install -e .
+```
+
+## 🚀 Quick Start
+
+```python
+import streamlit as st
+import streamlit_theta
+
+st.title("My App with Professional Editors")
+
+# Slide Editor - Create presentations
+slides = streamlit_theta.slide_editor(
+    slides=[],
+    width=900,
+    height=600
+)
+
+# Word Editor - Rich text documents
+document = streamlit_theta.word_editor(
+    content="<h1>Welcome</h1><p>Start typing here...</p>",
+    width=800,
+    height=600
+)
+
+# Excel Editor - Spreadsheets with formulas
+spreadsheet = streamlit_theta.excel_editor(
+    data=[["Name", "Age"], ["Alice", "25"], ["Bob", "30"]],
+    width=900,
+    height=500
+)
+
+# Chart Editor - Interactive charts and graphs
+chart_data = streamlit_theta.chart_editor(
+    width=900,
+    height=600
+)
+
+# Form Builder - Create custom forms
+form_config = streamlit_theta.form_builder(
+    width=900,
+    height=700
+)
+
+# Mind Map Editor - Visual brainstorming
+mindmap_data = streamlit_theta.mindmap_editor(
+    width=1000,
+    height=700
+)
+```
+
+## 📖 Detailed Usage
+
+### 🎯 Slide Editor
+
+Create PowerPoint/Keynote-style presentations with drag-and-drop elements:
+
+```python
+import streamlit_theta
+
+# Initialize with sample data
+initial_slides = [
+    {
+        "id": "slide_1",
+        "title": "Welcome Slide",
+        "elements": [
+            {
+                "type": "text",
+                "id": "title_1",
+                "content": "My Presentation",
+                "x": 50, "y": 100,
+                "width": 500, "height": 80,
+                "fontSize": 36,
+                "fontFamily": "Arial",
+                "color": "#000000",
+                "bold": True
+            }
+        ],
+        "background": "#ffffff"
+    }
+]
+
+# Create the editor
+slides = streamlit_theta.slide_editor(
+    slides=initial_slides,
+    width=900,
+    height=600
+)
+```
+
+**Features:**
+- Drag-and-drop text elements
+- Real-time property editing (fonts, colors, sizes)
+- Multiple slide support
+- Professional slide thumbnails
+- **Downloads as JSON** with complete presentation data
+
+### 📝 Word Editor
+
+Microsoft Word-style document editing with rich formatting:
+
+```python
+# Rich HTML content supported
+content = """
+<h1>Document Title</h1>
+<p>This is a <strong>bold</strong> paragraph with <em>italic</em> text.</p>
+<ul>
+    <li>Bullet point 1</li>
+    <li>Bullet point 2</li>
+</ul>
+"""
+
+document = streamlit_theta.word_editor(
+    content=content,
+    width=800,
+    height=600
+)
+```
+
+**Features:**
+- WYSIWYG editing with toolbar
+- Font selection and sizing
+- Text formatting (bold, italic, underline)
+- Paragraph alignment and spacing
+- A4 page layout with proper margins
+- Live word and character count
+- **Downloads as HTML** with embedded styling
+
+### 📊 Excel Editor
+
+Full-featured spreadsheet with Excel-like functionality:
+
+```python
+# Sample spreadsheet data
+data = [
+    ["Product", "Price", "Quantity", "Total"],
+    ["Widget A", "10.50", "5", "=B2*C2"],
+    ["Widget B", "15.75", "3", "=B3*C3"],
+    ["TOTAL", "", "", "=SUM(D2:D3)"]
+]
+
+spreadsheet = streamlit_theta.excel_editor(
+    data=data,
+    width=900,
+    height=500
+)
+```
+
+**Features:**
+- 26 columns (A-Z) with unlimited rows
+- Cell navigation with arrow keys
+- Formula bar for data entry
+- Add/remove rows and columns
+- Cell formatting options
+- **Downloads as CSV** with clean data export
+
+### 📋 CSV Editor
+
+Data table editor with import/export capabilities:
+
+```python
+# Table data with headers
+data = [
+    ["Name", "Age", "City"],
+    ["Alice", "25", "New York"],
+    ["Bob", "30", "Los Angeles"]
+]
+
+headers = ["Name", "Age", "City"]
+
+csv_result = streamlit_theta.csv_editor(
+    data=data,
+    headers=headers,
+    width=900,
+    height=500
+)
+```
+
+**Features:**
+- Editable headers and data cells
+- Add/remove rows and columns
+- CSV file import functionality
+- Data validation and cleaning
+- **Downloads as CSV** with headers and proper formatting
+
+### 🎵 Audio Editor
+
+Audio player with effects and controls:
+
+```python
+audio_settings = streamlit_theta.audio_editor(
+    width=800,
+    height=400
+)
+```
+
+**Features:**
+- File upload support (MP3, WAV, OGG, etc.)
+- Playback controls (play, pause, stop, seek)
+- Volume and speed adjustment
+- Pitch shifting controls
+- Waveform visualization
+- **Downloads audio settings as JSON**
+
+### 🎬 Video Editor
+
+Video player with filters and effects:
+
+```python
+video_settings = streamlit_theta.video_editor(
+    width=900,
+    height=600
+)
+```
+
+**Features:**
+- Video file upload (MP4, WebM, etc.)
+- Playback controls with timeline
+- Visual effects (brightness, contrast, saturation)
+- Color filters (grayscale, sepia, blur)
+- Timeline scrubbing
+- **Downloads video settings as JSON**
+
+### 📈 Chart Editor
+
+Interactive chart and graph creation tool with multiple chart types:
+
+```python
+chart_data = streamlit_theta.chart_editor(
+    width=900,
+    height=600
+)
+```
+
+**Features:**
+- Multiple chart types (line, bar, pie, scatter, area)
+- Interactive data input and editing
+- Customizable colors, labels, and legends
+- Real-time chart preview
+- Export options for charts
+- **Downloads chart data as JSON**
+
+### 🖼️ Image Editor
+
+Comprehensive image manipulation and editing suite:
+
+```python
+image_settings = streamlit_theta.image_editor(
+    width=800,
+    height=600
+)
+```
+
+**Features:**
+- Image upload and basic editing tools
+- Filters and effects (brightness, contrast, saturation)
+- Crop, resize, and rotate functionality
+- Drawing tools and annotations
+- Layer management
+- **Downloads edited image settings as JSON**
+
+### 📝 Form Builder
+
+Drag-and-drop form creation tool for interactive forms:
+
+```python
+form_config = streamlit_theta.form_builder(
+    width=900,
+    height=700
+)
+```
+
+**Features:**
+- Drag-and-drop form elements (input, select, checkbox, radio)
+- Real-time form preview
+- Field validation rules
+- Custom styling options
+- Form submission handling
+- **Downloads form configuration as JSON**
+
+### 🧠 Mind Map Editor
+
+Visual mind mapping and brainstorming tool:
+
+```python
+mindmap_data = streamlit_theta.mindmap_editor(
+    width=1000,
+    height=700
+)
+```
+
+**Features:**
+- Interactive node creation and editing
+- Hierarchical mind map structure
+- Customizable node colors and styles
+- Connection lines and relationships
+- Zoom and pan functionality
+- **Downloads mind map data as JSON**
+
+### 📐 Diagram Editor
+
+Professional flowchart and diagram creation tool:
+
+```python
+diagram_data = streamlit_theta.diagram_editor(
+    width=1000,
+    height=700
+)
+```
+
+**Features:**
+- Flowchart shapes and connectors
+- Drag-and-drop interface
+- Multiple diagram types (flowchart, org chart, network)
+- Shape styling and customization
+- Auto-layout and alignment tools
+- **Downloads diagram data as JSON**
+
+### 📧 Newsletter Editor
+
+Email and newsletter design tool with professional templates:
+
+```python
+newsletter_content = streamlit_theta.newsletter_editor(
+    width=900,
+    height=800
+)
+```
+
+**Features:**
+- Professional email templates
+- Drag-and-drop content blocks
+- Rich text editing
+- Image and media insertion
+- Mobile-responsive design
+- **Downloads newsletter HTML**
+
+## 💾 Download Functionality
+
+All editors support downloading your work in professional formats:
+
+| Editor | Format | File Name Pattern | Content |
+|--------|---------|-------------------|---------|
+| **Slide** | JSON | `presentation_YYYY-MM-DD-HHMMSS.json` | Complete presentation data |
+| **Word** | HTML | `document_YYYY-MM-DD-HHMMSS.html` | Formatted document with styles |
+| **Excel** | CSV | `spreadsheet_YYYY-MM-DD-HHMMSS.csv` | Clean spreadsheet data |
+| **CSV** | CSV | `data_YYYY-MM-DD-HHMMSS.csv` | Table data with headers |
+| **Audio** | JSON | `audio-settings_YYYY-MM-DD-HHMMSS.json` | Audio configuration |
+| **Video** | JSON | `video-settings_YYYY-MM-DD-HHMMSS.json` | Video settings and effects |
+| **Chart** | JSON | `chart-data_YYYY-MM-DD-HHMMSS.json` | Chart configuration and data |
+| **Image** | JSON | `image-settings_YYYY-MM-DD-HHMMSS.json` | Image editing settings |
+| **Form** | JSON | `form-config_YYYY-MM-DD-HHMMSS.json` | Form structure and validation |
+| **Mind Map** | JSON | `mindmap_YYYY-MM-DD-HHMMSS.json` | Mind map nodes and connections |
+| **Diagram** | JSON | `diagram_YYYY-MM-DD-HHMMSS.json` | Diagram shapes and flow |
+| **Newsletter** | HTML | `newsletter_YYYY-MM-DD-HHMMSS.html` | Complete newsletter HTML |
+
+### Download Features:
+- ✅ **Automatic timestamps** prevent file overwrites
+- ✅ **Standard formats** compatible with other applications  
+- ✅ **Client-side processing** - no data sent to servers
+- ✅ **Instant downloads** - files appear in your Downloads folder
+- ✅ **Cross-platform** - works on all operating systems
+- ✅ **No dependencies** - uses native browser APIs
+- ✅ **Production ready** - thoroughly tested and stable
+
+## 🎮 Demo Application
+
+Run the comprehensive demo to try all editors:
+
+   ```bash
+# Clone and install
+git clone https://github.com/your-repo/streamlit-theta
+cd streamlit-theta
+pip install -e .
+
+# Run the demo
+streamlit run theta_demo.py
+```
+
+The demo includes:
+- Interactive examples for all 12 editors
+- Sample data and templates
+- Feature demonstrations
+- Download testing
+- Usage instructions
+
+## 🔧 API Reference
+
+### Common Parameters
+
+All editors support these common parameters:
+
+- `width: int` - Editor width in pixels (default: varies by editor)
+- `height: int` - Editor height in pixels (default: varies by editor)
+- `key: str` - Unique component key (optional, for advanced use)
+
+### Return Values
+
+Due to Streamlit version compatibility, editors return `DeltaGenerator` objects rather than data. Use the download functionality to save your work in standard formats.
+
+## 🔗 Integration Examples
+
+### With Streamlit Pages
+
+```python
+import streamlit as st
+import streamlit_theta
+
+# Multi-page app
+pages = {
+    "Presentations": lambda: streamlit_theta.slide_editor(width=900, height=600),
+    "Documents": lambda: streamlit_theta.word_editor(width=800, height=600),
+    "Spreadsheets": lambda: streamlit_theta.excel_editor(width=900, height=500)
+}
+
+selected_page = st.sidebar.selectbox("Choose Editor", list(pages.keys()))
+pages[selected_page]()
+```
+
+### With Custom Styling
+
+```python
+# Custom CSS for editor container
+st.markdown("""
+<style>
+.theta-editor-container {
+    border: 2px solid #e1e5e9;
+    border-radius: 10px;
+    padding: 20px;
+    background: #f8f9fa;
+}
+</style>
+""", unsafe_allow_html=True)
+
+with st.container():
+    st.markdown('<div class="theta-editor-container">', unsafe_allow_html=True)
+    streamlit_theta.word_editor(width=800, height=500)
+    st.markdown('</div>', unsafe_allow_html=True)
+```
+
+## 🏗️ Architecture
+
+### Technology Stack
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **Backend**: Python 3.7+ with Streamlit Components API
+- **Styling**: Modern CSS with Flexbox/Grid layouts
+- **File Handling**: Blob API for client-side downloads
+- **Browser Support**: Chrome, Firefox, Safari, Edge (modern versions)
+
+### Component Structure
+```
+streamlit_theta/
+├── __init__.py          # Main package exports
+└── editor/
+    ├── __init__.py      # Editor exports
+    ├── slide.py         # Slide editor component
+    ├── word.py          # Word editor component
+    ├── excel.py         # Excel editor component
+    ├── csv.py           # CSV editor component
+    ├── audio.py         # Audio editor component
+    └── video.py         # Video editor component
+```
+
+## 🔒 Security & Privacy
+
+- **Client-side processing** - All editing happens in your browser
+- **No data transmission** - Files are created and downloaded locally
+- **No server storage** - Nothing is saved on external servers
+- **Standard formats** - Uses common file types (HTML, CSV, JSON)
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Import Error**: `ModuleNotFoundError: No module named 'streamlit_theta'`
+```bash
+# Ensure package is installed
+pip install -e . 
+# or
+pip install streamlit-theta
+```
+
+**Download Not Working**: Files not downloading to computer
+- Check browser popup blockers
+- Ensure JavaScript is enabled
+- Try in an incognito/private window
+- Check your browser's Downloads folder
+- Verify file permissions in download directory
+
+**Component Not Displaying**: Blank space where editor should be
+- Check browser console for JavaScript errors
+- Ensure Streamlit version compatibility (1.0+)
+- Try refreshing the page
+
+### Browser Compatibility
+
+| Browser | Version | Support |
+|---------|---------|---------|
+| Chrome | 90+ | ✅ Full |
+| Firefox | 88+ | ✅ Full |
+| Safari | 14+ | ✅ Full |
+| Edge | 90+ | ✅ Full |
+
+## 📄 License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+## 📧 Support
+
+- **Documentation**: Check this README and inline code comments
+- **Issues**: Open an issue on GitHub for bugs or feature requests
+- **Discussions**: Use GitHub Discussions for questions and ideas
+
+## 🚗 Roadmap
+
+- [ ] **File Import** - Load existing files into editors
+- [ ] **Template System** - Pre-built templates for common use cases
+- [ ] **Collaboration** - Real-time collaborative editing
+- [ ] **Export Options** - Additional export formats (PDF, DOCX, XLSX)
+- [ ] **Plugin System** - Custom editor extensions
+- [ ] **Cloud Storage** - Integration with cloud storage providers
+
+---
+
+**Built with ❤️ by CelsiaSolaraStarflare**
+
+*Transform your Streamlit apps with open source visual editing capabilities that your users will love!*

@@ -192,7 +192,7 @@ def theta_spreadsheet_editor(
                 <button onclick="deleteColumn()">- Column</button>
                 <button onclick="formatBold()">B</button>
                 <button onclick="formatItalic()">I</button>
-                <button onclick="saveSpreadsheet()">💾 Save</button>
+                <button onclick="saveSpreadsheet()">💾 Save CSV</button>
             </div>
             
             <!-- Formula Bar -->
@@ -347,18 +347,23 @@ def theta_spreadsheet_editor(
             
             function addRow() {{
                 spreadsheetData.push(new Array(26).fill(''));
-                // Re-render would be needed for dynamic rows
+                // Re-render to show the new row
+                initSpreadsheet();
                 console.log('Row added');
             }}
             
             function addColumn() {{
                 spreadsheetData.forEach(row => row.push(''));
+                // Re-render to show the new column
+                initSpreadsheet();
                 console.log('Column added');
             }}
             
             function deleteRow() {{
                 if (spreadsheetData.length > 1) {{
                     spreadsheetData.splice(selectedCell.row, 1);
+                    // Re-render to reflect the deleted row
+                    initSpreadsheet();
                     console.log('Row deleted');
                 }}
             }}
@@ -369,6 +374,8 @@ def theta_spreadsheet_editor(
                         row.splice(selectedCell.col, 1);
                     }}
                 }});
+                // Re-render to reflect the deleted column
+                initSpreadsheet();
                 console.log('Column deleted');
             }}
             

@@ -46,9 +46,9 @@ def theta_csv_editor(
     if not isinstance(headers, list):
         headers = [f"Column {i+1}" for i in range(len(data[0]) if data else 5)]
     
-    # Convert to JSON for JavaScript
-    data_json = json.dumps(data).replace('"', '\\"')
-    headers_json = json.dumps(headers).replace('"', '\\"')
+    # Convert to JSON for JavaScript (properly escaped)
+    data_json = json.dumps(data)
+    headers_json = json.dumps(headers)
     
     component_html = f"""
     <!DOCTYPE html>

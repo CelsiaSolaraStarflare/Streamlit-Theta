@@ -53,8 +53,8 @@ def powerpoint_editor(
         <title>PowerPoint Editor</title>
         <style>
             html, body {{ height: 100%; margin: 0; padding: 0; }}
-            body {{ background: #f0f0f0; width: 100vw; height: 100vh; }}
-            .ppt-editor {{ width: 100%; height: 100vh; max-width: 100vw; max-height: 100vh; background: #fff; border-radius: 10px; box-shadow: 0 2px 16px #0002; margin: 0 auto; display: flex; flex-direction: column; }}
+            body {{ background: #f0f0f0; margin: 0; padding: 0; }}
+            .ppt-editor {{ width: 100%; height: 100%; background: #fff; border-radius: 10px; box-shadow: 0 2px 16px #0002; margin: 0 auto; display: flex; flex-direction: column; }}
             .ppt-toolbar {{ height: 56px; background: #2d3748; color: #fff; display: flex; align-items: center; padding: 0 20px; gap: 10px; border-radius: 10px 10px 0 0; }}
             .ppt-toolbar button {{ background: #4a5568; color: #fff; border: none; border-radius: 4px; padding: 8px 14px; cursor: pointer; font-size: 14px; }}
             .ppt-toolbar button:hover {{ background: #3182ce; }}
@@ -63,7 +63,7 @@ def powerpoint_editor(
             .ppt-slide-thumb {{ width: 130px; height: 90px; background: #fff; border: 2px solid #cbd5e0; border-radius: 4px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666; }}
             .ppt-slide-thumb.active {{ border-color: #3182ce; }}
             .ppt-canvas-wrap {{ flex: 1; display: flex; align-items: center; justify-content: center; background: #f7fafc; position: relative; min-width: 0; min-height: 0; }}
-            .ppt-canvas {{ width: 90vw; max-width: 900px; height: 54vw; max-height: 540px; background: #fff; border: 2px solid #e2e8f0; border-radius: 8px; position: relative; overflow: visible; box-shadow: 0 8px 25px #0001; transition: transform 0.2s; }}
+            .ppt-canvas {{ width: 800px; height: 600px; background: #fff; border: 2px solid #e2e8f0; border-radius: 8px; position: relative; overflow: visible; box-shadow: 0 8px 25px #0001; transition: transform 0.2s; }}
             .ppt-element {{ position: absolute; border: 2px solid transparent; min-width: 40px; min-height: 20px; }}
             .ppt-element.selected {{ border-color: #3182ce; }}
             .ppt-element.text {{ padding: 8px 12px; background: #fff9; border-radius: 4px; font-size: 18px; line-height: 1.4; }}
@@ -89,7 +89,7 @@ def powerpoint_editor(
                     <button class='zoom-btn' id='zoom-in'>+</button>
                     <button class='zoom-btn' id='zoom-fit' title='Fit to window'>⛶</button>
                 </div>
-                <button id='ppt-export-json' style='margin-left:auto;'>Export JSON</button>
+                <button id='ppt-export-json' style='margin-left:auto;'>Export HTML</button>
             </div>
             <div class='ppt-main'>
                 <div class='ppt-slides' id='ppt-slide-list'></div>
@@ -211,12 +211,43 @@ def powerpoint_editor(
                 renderCanvas();
             }};
             document.getElementById('ppt-export-json').onclick = () => {{
-                let data = JSON.stringify(slides, null, 2);
-                let blob = new Blob([data], {{type:'application/json'}});
+                // Create an HTML presentation for better compatibility
+                let htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+    <title>Presentation</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }}
+        .slide {{ width: 800px; height: 600px; margin: 20px auto; padding: 40px; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); page-break-after: always; }}
+        .slide h1 {{ font-size: 32px; margin-bottom: 20px; }}
+        .slide h2 {{ font-size: 24px; margin-bottom: 15px; }}
+        .slide p {{ font-size: 18px; line-height: 1.6; margin-bottom: 15px; }}
+        @media print {{ body {{ background: white; }} .slide {{ box-shadow: none; }} }}
+    </style>
+</head>
+<body>`;
+                
+                slides.forEach((slide, index) => {{
+                    htmlContent += `<div class="slide" style="background: ${{slide.background || '#ffffff'}}">`;
+                    htmlContent += `<h1>${{slide.title || 'Slide ' + (index + 1)}}</h1>`;
+                    
+                    slide.elements.forEach(element => {{
+                        if (element.type === 'text') {{
+                            const tag = element.fontSize > 24 ? 'h2' : 'p';
+                            htmlContent += `<${{tag}} style="color: ${{element.color || '#222'}}; font-size: ${{element.fontSize || 18}}px;">${{element.content}}</${{tag}}>`;
+                        }}
+                    }});
+                    
+                    htmlContent += `</div>`;
+                }});
+                
+                htmlContent += `</body></html>`;
+                
+                let blob = new Blob([htmlContent], {{type:'text/html'}});
                 let url = URL.createObjectURL(blob);
                 let a = document.createElement('a');
                 a.href = url;
-                a.download = 'presentation.json';
+                a.download = 'presentation_' + new Date().toISOString().slice(0,19).replace(/:/g,'-') + '.html';
                 a.click();
                 URL.revokeObjectURL(url);
             }};

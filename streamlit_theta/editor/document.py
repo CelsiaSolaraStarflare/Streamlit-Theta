@@ -237,7 +237,7 @@ def theta_document_editor(
                 
                 <div class="toolbar-group">
                     <button id="save-doc" title="Save Document">💾 Save</button>
-                    <button id="save-docx" title="Save as DOCX">💾 Save DOCX</button>
+                    <button id="save-docx" title="Save as RTF (Word compatible)">💾 Save RTF</button>
                 </div>
             </div>
             
@@ -339,19 +339,19 @@ def theta_document_editor(
                 // Save button
                 document.getElementById('save-doc').onclick = saveDocument;
                 
-                // Save document as DOCX
+                // Save document as DOCX (as RTF for compatibility)
                 document.getElementById('save-docx').onclick = () => {{
                     const contentEl = document.getElementById('document');
                     const content = contentEl.innerHTML || contentEl.textContent || 'No content';
                     
-                    // Create a simple HTML version for download
-                    const htmlContent = '<!DOCTYPE html><html><head><title>Document</title><style>body {{font-family: Arial, sans-serif; margin: 40px; line-height: 1.6;}} .document {{max-width: 800px; margin: 0 auto;}}</style></head><body><div class="document">' + content + '</div></body></html>';
+                    // Create a simple RTF version for Word compatibility
+                    const rtfContent = `{{\\rtf1\\ansi\\deff0 {{\\fonttbl {{\\f0 Times New Roman;}}}}\\f0\\fs24 ${{content.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')}}}}`;
                     
-                    const blob = new Blob([htmlContent], {{type: 'text/html'}});
+                    const blob = new Blob([rtfContent], {{type: 'application/rtf'}});
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = 'document_' + new Date().toISOString().slice(0,19).replace(/:/g,'-') + '.html';
+                    a.download = 'document_' + new Date().toISOString().slice(0,19).replace(/:/g,'-') + '.rtf';
                     a.click();
                     URL.revokeObjectURL(url);
                 }};

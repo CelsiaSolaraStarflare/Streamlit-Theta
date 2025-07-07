@@ -1,5 +1,17 @@
 """
 Theta CSV Editor - Data table editor for CSV files
+
+This module provides a comprehensive CSV editor component for Streamlit applications.
+It includes features for:
+- Adding/removing rows and columns dynamically
+- Cell-by-cell editing with keyboard navigation
+- CSV import/export functionality
+- Robust error handling and data validation
+- Responsive design with customizable dimensions
+
+Version: 1.0.3+
+Author: Arcana Team
+License: Apache 2.0
 """
 
 import streamlit as st
@@ -26,29 +38,70 @@ def theta_csv_editor(
     headers : List[str] or None
         Column headers
     width : int
-        Width of the editor in pixels
+        Width of the editor in pixels (must be > 200)
     height : int  
-        Height of the editor in pixels
+        Height of the editor in pixels (must be > 200)
+    key : str or None
+        Unique key for the component
         
     Returns:
     --------
-    Dict containing 'data' and 'headers' keys or None
+    None (component-based editor)
     """
     
-    if data is None:
-        data = [["" for _ in range(5)] for _ in range(5)]
-    if headers is None:
-        headers = [f"Column {i+1}" for i in range(len(data[0]) if data else 5)]
+    # Input validation and sanitization
+    try:
+        # Validate dimensions
+        width = max(300, min(width, 2000))  # Constrain to reasonable bounds
+        height = max(200, min(height, 1200))
+        
+        # Initialize and validate data
+        if data is None or not isinstance(data, list):
+            data = [["" for _ in range(5)] for _ in range(5)]
+        else:
+            # Sanitize data - ensure it's a proper 2D list of strings
+            sanitized_data = []
+            for row in data:
+                if isinstance(row, list):
+                    sanitized_row = [str(cell) if cell is not None else "" for cell in row]
+                    sanitized_data.append(sanitized_row)
+                else:
+                    sanitized_data.append([""])
+            data = sanitized_data
+        
+        # Initialize and validate headers
+        if headers is None or not isinstance(headers, list):
+            headers = [f"Column {i+1}" for i in range(len(data[0]) if data and data[0] else 5)]
+        else:
+            # Sanitize headers
+            headers = [str(header) if header is not None else f"Column {i+1}" 
+                      for i, header in enumerate(headers)]
+        
+        # Ensure data and headers are consistent
+        if data and len(data[0]) != len(headers):
+            target_cols = max(len(headers), len(data[0]) if data[0] else 0)
+            # Adjust headers
+            while len(headers) < target_cols:
+                headers.append(f"Column {len(headers) + 1}")
+            headers = headers[:target_cols]
+            
+            # Adjust data
+            for row in data:
+                while len(row) < target_cols:
+                    row.append("")
+                row[:] = row[:target_cols]
     
-    # Safety checks: ensure data and headers are proper types, not DeltaGenerators
-    if not isinstance(data, list):
-        data = [["" for _ in range(5)] for _ in range(5)]
-    if not isinstance(headers, list):
-        headers = [f"Column {i+1}" for i in range(len(data[0]) if data else 5)]
+    except Exception as e:
+        st.error(f"Error initializing CSV editor: {e}")
+        return None
     
-    # Convert to JSON for JavaScript
-    data_json = json.dumps(data).replace('"', '\\"')
-    headers_json = json.dumps(headers).replace('"', '\\"')
+    # Convert to JSON for JavaScript with proper escaping
+    try:
+        data_json = json.dumps(data).replace('"', '\\"').replace("'", "\\'")
+        headers_json = json.dumps(headers).replace('"', '\\"').replace("'", "\\'")
+    except Exception as e:
+        st.error(f"Error encoding data to JSON: {e}")
+        return None
     
     component_html = f"""
     <!DOCTYPE html>
@@ -229,82 +282,127 @@ def theta_csv_editor(
             let selectedCol = -1;
             
             function initTable() {{
-                renderTable();
-                updateStats();
+                try {{
+                    renderTable();
+                    updateStats();
+                }} catch (error) {{
+                    console.error('Error initializing table:', error);
+                    alert('Error initializing table. Please refresh the page.');
+                }}
             }}
             
             function renderTable() {{
-                const table = document.getElementById('data-table');
-                table.innerHTML = '';
-                
-                // Header row
-                const headerRow = document.createElement('tr');
-                
-                // Row number header
-                const rowNumHeader = document.createElement('th');
-                rowNumHeader.className = 'row-number';
-                rowNumHeader.textContent = '#';
-                headerRow.appendChild(rowNumHeader);
-                
-                // Column headers
-                csvHeaders.forEach((header, index) => {{
-                    const th = document.createElement('th');
-                    const input = document.createElement('input');
-                    input.className = 'header-input';
-                    input.value = header;
-                    input.onchange = () => updateHeader(index, input.value);
-                    th.appendChild(input);
-                    headerRow.appendChild(th);
-                }});
-                
-                table.appendChild(headerRow);
-                
-                // Data rows
-                csvData.forEach((row, rowIndex) => {{
-                    const tr = document.createElement('tr');
+                try {{
+                    const table = document.getElementById('data-table');
+                    if (!table) {{
+                        throw new Error('Table element not found');
+                    }}
                     
-                    // Row number
-                    const rowNumCell = document.createElement('td');
-                    rowNumCell.className = 'row-number';
-                    rowNumCell.textContent = rowIndex + 1;
-                    rowNumCell.onclick = () => selectRow(rowIndex);
-                    tr.appendChild(rowNumCell);
+                    table.innerHTML = '';
                     
-                    // Data cells
-                    row.forEach((cell, colIndex) => {{
-                        const td = document.createElement('td');
-                        const input = document.createElement('input');
-                        input.value = cell;
-                        input.dataset.row = rowIndex;
-                        input.dataset.col = colIndex;
-                        input.oninput = () => updateCell(rowIndex, colIndex, input.value);
-                        input.onfocus = () => selectCell(rowIndex, colIndex);
-                        input.onkeydown = (e) => handleKeydown(e, rowIndex, colIndex);
-                        td.appendChild(input);
-                        tr.appendChild(td);
-                    }});
+                    // Header row
+                    const headerRow = document.createElement('tr');
                     
-                    table.appendChild(tr);
-                }});
+                    // Row number header
+                    const rowNumHeader = document.createElement('th');
+                    rowNumHeader.className = 'row-number';
+                    rowNumHeader.textContent = '#';
+                    headerRow.appendChild(rowNumHeader);
+                    
+                    // Column headers
+                    if (Array.isArray(csvHeaders)) {{
+                        csvHeaders.forEach((header, index) => {{
+                            const th = document.createElement('th');
+                            const input = document.createElement('input');
+                            input.className = 'header-input';
+                            input.value = header || `Column ${{index + 1}}`;
+                            input.onchange = () => updateHeader(index, input.value);
+                            th.appendChild(input);
+                            headerRow.appendChild(th);
+                        }});
+                    }}
+                    
+                    table.appendChild(headerRow);
+                    
+                    // Data rows
+                    if (Array.isArray(csvData)) {{
+                        csvData.forEach((row, rowIndex) => {{
+                            if (!Array.isArray(row)) return; // Skip invalid rows
+                            
+                            const tr = document.createElement('tr');
+                            
+                            // Row number
+                            const rowNumCell = document.createElement('td');
+                            rowNumCell.className = 'row-number';
+                            rowNumCell.textContent = rowIndex + 1;
+                            rowNumCell.onclick = () => selectRow(rowIndex);
+                            tr.appendChild(rowNumCell);
+                            
+                            // Data cells
+                            row.forEach((cell, colIndex) => {{
+                                const td = document.createElement('td');
+                                const input = document.createElement('input');
+                                input.value = cell || '';
+                                input.dataset.row = rowIndex;
+                                input.dataset.col = colIndex;
+                                input.oninput = () => updateCell(rowIndex, colIndex, input.value);
+                                input.onfocus = () => selectCell(rowIndex, colIndex);
+                                input.onkeydown = (e) => handleKeydown(e, rowIndex, colIndex);
+                                td.appendChild(input);
+                                tr.appendChild(td);
+                            }});
+                            
+                            table.appendChild(tr);
+                        }});
+                    }}
+                }} catch (error) {{
+                    console.error('Error rendering table:', error);
+                    alert('Error rendering table. Please try again.');
+                }}
             }}
             
             function updateHeader(index, value) {{
-                csvHeaders[index] = value;
-                updateStats();
+                try {{
+                    if (Array.isArray(csvHeaders) && index >= 0 && index < csvHeaders.length) {{
+                        csvHeaders[index] = value || `Column ${{index + 1}}`;
+                        updateStats();
+                    }}
+                }} catch (error) {{
+                    console.error('Error updating header:', error);
+                }}
             }}
             
             function updateCell(row, col, value) {{
-                csvData[row][col] = value;
+                try {{
+                    if (Array.isArray(csvData) && row >= 0 && row < csvData.length &&
+                        Array.isArray(csvData[row]) && col >= 0 && col < csvData[row].length) {{
+                        csvData[row][col] = value || '';
+                    }}
+                }} catch (error) {{
+                    console.error('Error updating cell:', error);
+                }}
             }}
             
             function selectCell(row, col) {{
-                selectedRow = row;
-                selectedCol = col;
+                try {{
+                    if (row >= 0 && col >= 0) {{
+                        selectedRow = row;
+                        selectedCol = col;
+                    }}
+                }} catch (error) {{
+                    console.error('Error selecting cell:', error);
+                }}
             }}
             
             function selectRow(row) {{
-                selectedRow = row;
-                selectedCol = -1;
+                try {{
+                    if (row >= 0) {{
+                        selectedRow = row;
+                        selectedCol = -1;
+                    }}
+                }} catch (error) {{
+                    console.error('Error selecting row:', error);
+                }}
             }}
             
             function handleKeydown(e, row, col) {{
@@ -358,33 +456,71 @@ def theta_csv_editor(
             }}
             
             function addRow() {{
-                const newRow = new Array(csvHeaders.length).fill('');
-                csvData.push(newRow);
-                renderTable();
-                updateStats();
+                try {{
+                    const newRow = new Array(csvHeaders.length).fill('');
+                    csvData.push(newRow);
+                    renderTable();
+                    updateStats();
+                    console.log('Row added successfully');
+                }} catch (error) {{
+                    console.error('Error adding row:', error);
+                    alert('Error adding row. Please try again.');
+                }}
             }}
             
             function addColumn() {{
-                csvHeaders.push(`Column ${{csvHeaders.length + 1}}`);
-                csvData.forEach(row => row.push(''));
-                renderTable();
-                updateStats();
+                try {{
+                    csvHeaders.push(`Column ${{csvHeaders.length + 1}}`);
+                    csvData.forEach(row => {{
+                        if (Array.isArray(row)) {{
+                            row.push('');
+                        }}
+                    }});
+                    renderTable();
+                    updateStats();
+                    console.log('Column added successfully');
+                }} catch (error) {{
+                    console.error('Error adding column:', error);
+                    alert('Error adding column. Please try again.');
+                }}
             }}
             
             function deleteRow() {{
-                if (selectedRow >= 0 && csvData.length > 1) {{
-                    csvData.splice(selectedRow, 1);
-                    renderTable();
-                    updateStats();
+                try {{
+                    if (selectedRow >= 0 && csvData.length > 1) {{
+                        csvData.splice(selectedRow, 1);
+                        selectedRow = -1; // Reset selection
+                        renderTable();
+                        updateStats();
+                        console.log('Row deleted successfully');
+                    }} else {{
+                        alert('Please select a row to delete, and ensure at least one row remains.');
+                    }}
+                }} catch (error) {{
+                    console.error('Error deleting row:', error);
+                    alert('Error deleting row. Please try again.');
                 }}
             }}
             
             function deleteColumn() {{
-                if (selectedCol >= 0 && csvHeaders.length > 1) {{
-                    csvHeaders.splice(selectedCol, 1);
-                    csvData.forEach(row => row.splice(selectedCol, 1));
-                    renderTable();
-                    updateStats();
+                try {{
+                    if (selectedCol >= 0 && csvHeaders.length > 1) {{
+                        csvHeaders.splice(selectedCol, 1);
+                        csvData.forEach(row => {{
+                            if (Array.isArray(row) && row.length > selectedCol) {{
+                                row.splice(selectedCol, 1);
+                            }}
+                        }});
+                        selectedCol = -1; // Reset selection
+                        renderTable();
+                        updateStats();
+                        console.log('Column deleted successfully');
+                    }} else {{
+                        alert('Please select a column to delete, and ensure at least one column remains.');
+                    }}
+                }} catch (error) {{
+                    console.error('Error deleting column:', error);
+                    alert('Error deleting column. Please try again.');
                 }}
             }}
             

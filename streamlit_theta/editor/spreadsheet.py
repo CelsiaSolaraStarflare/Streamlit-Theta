@@ -1,6 +1,22 @@
 """
 Theta Spreadsheet Editor - Visual spreadsheet editor for Streamlit
-Provides a grid interface for creating and editing spreadsheets.
+
+This module provides a full-featured spreadsheet editor component that mimics
+traditional spreadsheet applications like Excel. Features include:
+- Grid-based interface with A-Z column headers and numbered rows
+- Formula bar for cell value editing
+- Dynamic row/column addition and deletion
+- Keyboard navigation (arrows, tab, enter)
+- Cell formatting options (bold, italic)
+- CSV export functionality
+- Robust error handling and data validation
+
+The editor supports up to 26 columns (A-Z) and dynamically expandable rows.
+All data is validated and sanitized to prevent errors and ensure stability.
+
+Version: 1.0.3+
+Author: Arcana Team
+License: Apache 2.0
 """
 
 import streamlit as st
@@ -22,28 +38,55 @@ def theta_spreadsheet_editor(
     data : List[List[str]] or None
         Initial spreadsheet data as 2D array
     width : int
-        Width of the editor in pixels
+        Width of the editor in pixels (constrained to 300-2000)
     height : int  
-        Height of the editor in pixels
+        Height of the editor in pixels (constrained to 400-1200)
     key : str or None
         Unique key for the component
         
     Returns:
     --------
-    List[List[str]] or None
-        Updated spreadsheet data or None if no changes
+    None (component-based editor)
     """
     
-    if data is None:
-        # Initialize with empty 10x26 grid (A-Z columns)
-        data = [["" for _ in range(26)] for _ in range(10)]
+    # Input validation and sanitization
+    try:
+        # Validate dimensions
+        width = max(300, min(width, 2000))
+        height = max(400, min(height, 1200))
+        
+        # Initialize and validate data
+        if data is None or not isinstance(data, list):
+            # Initialize with empty 10x26 grid (A-Z columns)
+            data = [["" for _ in range(26)] for _ in range(10)]
+        else:
+            # Sanitize data - ensure it's a proper 2D list of strings
+            sanitized_data = []
+            for row in data:
+                if isinstance(row, list):
+                    sanitized_row = [str(cell) if cell is not None else "" for cell in row]
+                    # Ensure at least 26 columns (A-Z)
+                    while len(sanitized_row) < 26:
+                        sanitized_row.append("")
+                    sanitized_data.append(sanitized_row[:26])  # Limit to 26 columns
+                else:
+                    sanitized_data.append(["" for _ in range(26)])
+            data = sanitized_data
+            
+            # Ensure at least 10 rows
+            while len(data) < 10:
+                data.append(["" for _ in range(26)])
     
-    # Safety check: ensure data is a proper list, not a DeltaGenerator
-    if not isinstance(data, list):
-        data = [["" for _ in range(26)] for _ in range(10)]
+    except Exception as e:
+        st.error(f"Error initializing spreadsheet editor: {e}")
+        return None
     
-    # Convert data to JSON for JavaScript
-    data_json = json.dumps(data).replace('"', '\\"')
+    # Convert data to JSON for JavaScript with proper escaping
+    try:
+        data_json = json.dumps(data).replace('"', '\\"').replace("'", "\\'")
+    except Exception as e:
+        st.error(f"Error encoding spreadsheet data to JSON: {e}")
+        return None
     
     # Component HTML/CSS/JS for spreadsheet-like editor
     component_html = f"""
@@ -219,55 +262,80 @@ def theta_spreadsheet_editor(
             const columnHeaders = Array.from({{length: 26}}, (_, i) => String.fromCharCode(65 + i));
             
             function initSpreadsheet() {{
-                const container = document.getElementById('spreadsheet');
-                container.innerHTML = '';
-                
-                // Empty top-left cell
-                const topLeft = document.createElement('div');
-                topLeft.className = 'header-cell';
-                container.appendChild(topLeft);
-                
-                // Column headers
-                columnHeaders.forEach((header, index) => {{
-                    const headerCell = document.createElement('div');
-                    headerCell.className = 'header-cell';
-                    headerCell.textContent = header;
-                    headerCell.onclick = () => selectColumn(index);
-                    container.appendChild(headerCell);
-                }});
-                
-                // Rows
-                for (let row = 0; row < 100; row++) {{
-                    // Row header
-                    const rowHeader = document.createElement('div');
-                    rowHeader.className = 'row-header';
-                    rowHeader.textContent = row + 1;
-                    rowHeader.onclick = () => selectRow(row);
-                    container.appendChild(rowHeader);
-                    
-                    // Data cells
-                    for (let col = 0; col < 26; col++) {{
-                        const cell = document.createElement('input');
-                        cell.className = 'cell';
-                        cell.type = 'text';
-                        cell.dataset.row = row;
-                        cell.dataset.col = col;
-                        
-                        // Set initial value
-                        if (spreadsheetData[row] && spreadsheetData[row][col]) {{
-                            cell.value = spreadsheetData[row][col];
-                        }}
-                        
-                        // Event listeners
-                        cell.onfocus = () => selectCell(row, col);
-                        cell.oninput = () => updateCell(row, col, cell.value);
-                        cell.onkeydown = (e) => handleKeydown(e, row, col);
-                        
-                        container.appendChild(cell);
+                try {{
+                    const container = document.getElementById('spreadsheet');
+                    if (!container) {{
+                        throw new Error('Spreadsheet container not found');
                     }}
+                    
+                    container.innerHTML = '';
+                    
+                    // Empty top-left cell
+                    const topLeft = document.createElement('div');
+                    topLeft.className = 'header-cell';
+                    topLeft.style.gridColumn = '1';
+                    topLeft.style.gridRow = '1';
+                    container.appendChild(topLeft);
+                    
+                    // Column headers
+                    columnHeaders.forEach((header, index) => {{
+                        const headerCell = document.createElement('div');
+                        headerCell.className = 'header-cell';
+                        headerCell.textContent = header;
+                        headerCell.style.gridColumn = `${{index + 2}}`;
+                        headerCell.style.gridRow = '1';
+                        headerCell.onclick = () => selectColumn(index);
+                        container.appendChild(headerCell);
+                    }});
+                    
+                    // Ensure spreadsheetData is properly initialized
+                    if (!Array.isArray(spreadsheetData)) {{
+                        spreadsheetData = [];
+                    }}
+                    
+                    // Ensure we have at least 100 rows for the grid
+                    const maxRows = Math.max(100, spreadsheetData.length);
+                    
+                    // Rows
+                    for (let row = 0; row < maxRows; row++) {{
+                        // Row header
+                        const rowHeader = document.createElement('div');
+                        rowHeader.className = 'row-header';
+                        rowHeader.textContent = row + 1;
+                        rowHeader.style.gridColumn = '1';
+                        rowHeader.style.gridRow = `${{row + 2}}`;
+                        rowHeader.onclick = () => selectRow(row);
+                        container.appendChild(rowHeader);
+                        
+                        // Data cells
+                        for (let col = 0; col < 26; col++) {{
+                            const cell = document.createElement('input');
+                            cell.className = 'cell';
+                            cell.type = 'text';
+                            cell.dataset.row = row;
+                            cell.dataset.col = col;
+                            cell.style.gridColumn = `${{col + 2}}`;
+                            cell.style.gridRow = `${{row + 2}}`;
+                            
+                            // Set initial value
+                            if (spreadsheetData[row] && spreadsheetData[row][col]) {{
+                                cell.value = spreadsheetData[row][col];
+                            }}
+                            
+                            // Event listeners
+                            cell.onfocus = () => selectCell(row, col);
+                            cell.oninput = () => updateCell(row, col, cell.value);
+                            cell.onkeydown = (e) => handleKeydown(e, row, col);
+                            
+                            container.appendChild(cell);
+                        }}
+                    }}
+                    
+                    updateFormulaBar();
+                }} catch (error) {{
+                    console.error('Error initializing spreadsheet:', error);
+                    alert('Error initializing spreadsheet. Please refresh the page.');
                 }}
-                
-                updateFormulaBar();
             }}
             
             function selectCell(row, col) {{
@@ -346,30 +414,115 @@ def theta_spreadsheet_editor(
             }}
             
             function addRow() {{
-                spreadsheetData.push(new Array(26).fill(''));
-                // Re-render would be needed for dynamic rows
-                console.log('Row added');
+                try {{
+                    const newRow = new Array(26).fill('');
+                    spreadsheetData.push(newRow);
+                    
+                    // Add the new row to the existing grid
+                    const container = document.getElementById('spreadsheet');
+                    const rowIndex = spreadsheetData.length - 1;
+                    
+                    // Row header
+                    const rowHeader = document.createElement('div');
+                    rowHeader.className = 'row-header';
+                    rowHeader.textContent = rowIndex + 1;
+                    rowHeader.onclick = () => selectRow(rowIndex);
+                    rowHeader.style.gridColumn = '1';
+                    rowHeader.style.gridRow = `${{rowIndex + 2}}`;
+                    container.appendChild(rowHeader);
+                    
+                    // Data cells
+                    for (let col = 0; col < 26; col++) {{
+                        const cell = document.createElement('input');
+                        cell.className = 'cell';
+                        cell.type = 'text';
+                        cell.dataset.row = rowIndex;
+                        cell.dataset.col = col;
+                        cell.value = '';
+                        cell.style.gridColumn = `${{col + 2}}`;
+                        cell.style.gridRow = `${{rowIndex + 2}}`;
+                        
+                        cell.onfocus = () => selectCell(rowIndex, col);
+                        cell.oninput = () => updateCell(rowIndex, col, cell.value);
+                        cell.onkeydown = (e) => handleKeydown(e, rowIndex, col);
+                        
+                        container.appendChild(cell);
+                    }}
+                    
+                    console.log('Row added successfully');
+                }} catch (error) {{
+                    console.error('Error adding row:', error);
+                    alert('Error adding row. Please try again.');
+                }}
             }}
             
             function addColumn() {{
-                spreadsheetData.forEach(row => row.push(''));
-                console.log('Column added');
+                try {{
+                    spreadsheetData.forEach(row => {{
+                        if (Array.isArray(row)) {{
+                            row.push('');
+                        }}
+                    }});
+                    
+                    // Re-initialize the spreadsheet to include the new column
+                    initSpreadsheet();
+                    console.log('Column added successfully');
+                }} catch (error) {{
+                    console.error('Error adding column:', error);
+                    alert('Error adding column. Please try again.');
+                }}
             }}
             
             function deleteRow() {{
-                if (spreadsheetData.length > 1) {{
-                    spreadsheetData.splice(selectedCell.row, 1);
-                    console.log('Row deleted');
+                try {{
+                    if (spreadsheetData.length > 1 && selectedCell.row >= 0) {{
+                        spreadsheetData.splice(selectedCell.row, 1);
+                        
+                        // Re-initialize the spreadsheet to reflect the deletion
+                        initSpreadsheet();
+                        
+                        // Adjust selected cell if needed
+                        if (selectedCell.row >= spreadsheetData.length) {{
+                            selectedCell.row = Math.max(0, spreadsheetData.length - 1);
+                        }}
+                        
+                        selectCell(selectedCell.row, selectedCell.col);
+                        console.log('Row deleted successfully');
+                    }} else {{
+                        alert('Please select a row to delete, and ensure at least one row remains.');
+                    }}
+                }} catch (error) {{
+                    console.error('Error deleting row:', error);
+                    alert('Error deleting row. Please try again.');
                 }}
             }}
             
             function deleteColumn() {{
-                spreadsheetData.forEach(row => {{
-                    if (row.length > 1) {{
-                        row.splice(selectedCell.col, 1);
+                try {{
+                    if (selectedCell.col >= 0) {{
+                        spreadsheetData.forEach(row => {{
+                            if (Array.isArray(row) && row.length > 1) {{
+                                row.splice(selectedCell.col, 1);
+                            }}
+                        }});
+                        
+                        // Re-initialize the spreadsheet to reflect the deletion
+                        initSpreadsheet();
+                        
+                        // Adjust selected cell if needed
+                        if (selectedCell.col >= (spreadsheetData[0] ? spreadsheetData[0].length : 26)) {{
+                            selectedCell.col = Math.max(0, (spreadsheetData[0] ? spreadsheetData[0].length : 26) - 1);
+                        }}
+                        
+                        selectCell(selectedCell.row, selectedCell.col);
+                        console.log('Column deleted successfully');
+                    }} else {{
+                        alert('Please select a column to delete, and ensure at least one column remains.');
                     }}
-                }});
-                console.log('Column deleted');
+                }} catch (error) {{
+                    console.error('Error deleting column:', error);
+                    alert('Error deleting column. Please try again.');
+                }}
             }}
             
             function formatBold() {{

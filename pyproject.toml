@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "streamlit-theta"
-version = "1.0.3"
+version = "1.0.4"
 description = "Comprehensive visual editors suite for Streamlit: presentations, documents, spreadsheets, charts, images, forms, mind maps, diagrams, newsletters, and more. Professional-grade editing tools for modern web applications."
 readme = "README.md"
 license = {text = "Apache-2.0"}

@@ -1,7 +1,8 @@
 # Streamlit Theta - Open Source Visual Editors Suite for Streamlit
 # Provides editors for presentations, documents, spreadsheets, tables, audio, video, charts, images, forms, mind maps, diagrams, and newsletters.
+# Enhanced with new modes, themes, and automation features.
 
-# from .editor.slide import theta_slide_editor  # Disabled to avoid missing frontend/build error
+# Standard editors
 from .editor.document import theta_document_editor
 from .editor.spreadsheet import theta_spreadsheet_editor
 from .editor.csv import theta_csv_editor
@@ -15,6 +16,12 @@ from .editor.diagram import theta_diagram_editor
 from .editor.newsletter import theta_newsletter_editor
 from .editor.powerpoint import powerpoint_editor as theta_slide_editor
 
+# Enhanced editors with new features
+from .editor.document_enhanced import theta_document_editor_enhanced
+from .editor.chart_enhanced import theta_chart_editor_enhanced
+
+# Theme manager
+from .theme_manager import ThemeManager
 
 # Convenience imports
 slide_editor = theta_slide_editor
@@ -30,13 +37,16 @@ mindmap_editor = theta_mindmap_editor
 diagram_editor = theta_diagram_editor
 newsletter_editor = theta_newsletter_editor
 
+# Enhanced convenience imports
+document_editor_enhanced = theta_document_editor_enhanced
+chart_editor_enhanced = theta_chart_editor_enhanced
 
-
-__version__ = "1.0.4"
+__version__ = "1.1.0"
 __author__ = "Arcana Team"
-__description__ = "Comprehensive visual editors suite for Streamlit: presentations, documents, spreadsheets, charts, images, forms, mind maps, diagrams, newsletters, and more"
+__description__ = "Enhanced visual editors suite for Streamlit with advanced modes, themes, and automation features"
 
 __all__ = [
+    # Standard editors
     'theta_slide_editor',
     'theta_document_editor',
     'theta_spreadsheet_editor', 
@@ -49,6 +59,15 @@ __all__ = [
     'theta_mindmap_editor',
     'theta_diagram_editor',
     'theta_newsletter_editor',
+    
+    # Enhanced editors
+    'theta_document_editor_enhanced',
+    'theta_chart_editor_enhanced',
+    
+    # Theme manager
+    'ThemeManager',
+    
+    # Convenience imports
     'slide_editor',
     'document_editor',
     'spreadsheet_editor',
@@ -60,5 +79,7 @@ __all__ = [
     'form_builder',
     'mindmap_editor',
     'diagram_editor',
-    'newsletter_editor'
+    'newsletter_editor',
+    'document_editor_enhanced',
+    'chart_editor_enhanced'
 ]

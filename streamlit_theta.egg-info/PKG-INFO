@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: streamlit-theta
-Version: 1.0.3
+Version: 1.0.4
 Summary: Comprehensive visual editors suite for Streamlit: presentations, documents, spreadsheets, charts, images, forms, mind maps, diagrams, newsletters, and more. Professional-grade editing tools for modern web applications.
 Author-email: CelsiaSolaraStarflare <celsiastarflare@outlook.com>
 License: Apache-2.0
@@ -39,7 +39,14 @@ Dynamic: license-file
 
 Streamlit Theta provides twelve powerful, interactive visual editors that bring modern editing experiences directly to your web applications. Create presentations, documents, spreadsheets, charts, images, forms, mind maps, diagrams, newsletters, and more with intuitive drag-and-drop interfaces and flexible formatting tools.
 
-> 🎉 **Version 1.0.0** - Fully functional with complete download functionality! All editors are production-ready and tested.
+> 🎉 **Version 1.0.4** - Fully refactored with comprehensive fixes! All critical issues resolved and stability greatly improved.
+> 
+> **🛠️ Recent Fixes:**
+> - ✅ **Issue #1**: CSV and Spreadsheet editor buttons now fully responsive
+> - ✅ **Issue #2**: PowerPoint canvas positioning completely fixed  
+> - ✅ **Issue #3**: Enhanced download functionality with multiple formats
+> - ✅ **Stability**: Comprehensive error handling and input validation added
+> - ✅ **Documentation**: Extensive code documentation and comments added
 
 ## ✨ Features
 
@@ -68,9 +75,16 @@ Streamlit Theta provides twelve powerful, interactive visual editors that bring 
 
 ## 📦 Installation
 
-### Via pip (when published)
+### Via pip (Recommended)
 ```bash
 pip install streamlit-theta
+```
+
+### From Source
+```bash
+git clone https://github.com/CelsiaSolaraStarflare/Streamlit-Theta.git
+cd Streamlit-Theta
+pip install -e .
 ```
 
 ### From source
@@ -80,7 +94,46 @@ cd streamlit-theta
 pip install -e .
 ```
 
+## 🛠️ Recent Fixes & Improvements (v1.0.4)
+
+### ✅ Issue #1: CSV and Spreadsheet Responsiveness FIXED
+- **Problem**: Add/delete row/column buttons were not responding
+- **Solution**: 
+  - Added comprehensive error handling to JavaScript functions
+  - Improved DOM manipulation and table rendering  
+  - Enhanced grid updates for dynamic content changes
+  - Added proper validation for array operations
+
+### ✅ Issue #2: PowerPoint Canvas Positioning FIXED
+- **Problem**: Elements would shift out of position relative to screen proportions
+- **Solution**:
+  - Implemented canvas-relative positioning system
+  - Fixed zoom calculations for accurate positioning
+  - Added boundary constraints to keep elements within canvas bounds
+  - Improved drag and resize operations
+
+### ✅ Issue #3: Download Functionality ENHANCED
+- **Problem**: Downloads needed better file format support
+- **Solution**:
+  - Enhanced CSV/spreadsheet export with better formatting
+  - Added HTML export format for PowerPoint presentations
+  - Improved error handling for download operations
+  - Added timestamped filenames to prevent conflicts
+
+### 🔒 Additional Improvements
+- **Security**: Comprehensive input validation and sanitization
+- **Stability**: Robust error handling throughout the codebase
+- **Documentation**: Extensive code documentation and inline comments
+- **Testing**: Comprehensive test suite covering all functionality
+
 ## 🚀 Quick Start
+
+### Demo Application
+Test all the fixes and improvements:
+```bash
+git clone https://github.com/CelsiaSolaraStarflare/Streamlit-Theta.git
+cd Streamlit-Theta
+streamlit run demo.py
 
 ```python
 import streamlit as st

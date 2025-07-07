@@ -1,6 +1,22 @@
 """
 Theta Spreadsheet Editor - Visual spreadsheet editor for Streamlit
-Provides a grid interface for creating and editing spreadsheets.
+
+This module provides a full-featured spreadsheet editor component that mimics
+traditional spreadsheet applications like Excel. Features include:
+- Grid-based interface with A-Z column headers and numbered rows
+- Formula bar for cell value editing
+- Dynamic row/column addition and deletion
+- Keyboard navigation (arrows, tab, enter)
+- Cell formatting options (bold, italic)
+- CSV export functionality
+- Robust error handling and data validation
+
+The editor supports up to 26 columns (A-Z) and dynamically expandable rows.
+All data is validated and sanitized to prevent errors and ensure stability.
+
+Version: 1.0.3+
+Author: Arcana Team
+License: Apache 2.0
 """
 
 import streamlit as st

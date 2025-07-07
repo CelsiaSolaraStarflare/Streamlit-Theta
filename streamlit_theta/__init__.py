@@ -32,7 +32,7 @@ newsletter_editor = theta_newsletter_editor
 
 
 
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 __author__ = "Arcana Team"
 __description__ = "Comprehensive visual editors suite for Streamlit: presentations, documents, spreadsheets, charts, images, forms, mind maps, diagrams, newsletters, and more"
 

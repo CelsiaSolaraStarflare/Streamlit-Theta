@@ -1,5 +1,17 @@
 """
 Theta CSV Editor - Data table editor for CSV files
+
+This module provides a comprehensive CSV editor component for Streamlit applications.
+It includes features for:
+- Adding/removing rows and columns dynamically
+- Cell-by-cell editing with keyboard navigation
+- CSV import/export functionality
+- Robust error handling and data validation
+- Responsive design with customizable dimensions
+
+Version: 1.0.3+
+Author: Arcana Team
+License: Apache 2.0
 """
 
 import streamlit as st

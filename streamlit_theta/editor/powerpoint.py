@@ -1,6 +1,37 @@
 """
 PowerPoint Editor - Streamlit Component
-A comprehensive PowerPoint-style editor for creating, editing, and exporting presentations.
+
+A comprehensive PowerPoint-style presentation editor for Streamlit applications.
+This component provides a full-featured presentation creation and editing interface
+with the following capabilities:
+
+Core Features:
+- Multi-slide presentation management
+- Drag-and-drop element positioning
+- Resizable text, image, and shape elements
+- Zoom controls with proper positioning calculations
+- Slide thumbnails for easy navigation
+- Professional toolbar with editing controls
+
+Element Types:
+- Text elements with font customization (size, family, color, weight)
+- Image elements with URL-based loading
+- Shape elements (rectangles, circles, triangles)
+
+Export Options:
+- JSON format for data preservation
+- HTML format for web viewing
+- Proper error handling for all export operations
+
+Technical Improvements:
+- Canvas-relative positioning system to prevent element drift
+- Boundary constraints to keep elements within canvas
+- Zoom-aware drag and resize calculations
+- Comprehensive error handling and validation
+
+Version: 1.0.3+
+Author: Arcana Team
+License: Apache 2.0
 """
 
 import streamlit as st

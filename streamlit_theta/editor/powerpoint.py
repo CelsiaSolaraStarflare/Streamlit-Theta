@@ -89,7 +89,8 @@ def powerpoint_editor(
                     <button class='zoom-btn' id='zoom-in'>+</button>
                     <button class='zoom-btn' id='zoom-fit' title='Fit to window'>⛶</button>
                 </div>
-                <button id='ppt-export-json' style='margin-left:auto;'>Export JSON</button>
+                <button id='ppt-export-json' style='margin-left:auto;'>💾 Export JSON</button>
+                <button id='ppt-export-html'>📄 Export HTML</button>
             </div>
             <div class='ppt-main'>
                 <div class='ppt-slides' id='ppt-slide-list'></div>
@@ -211,15 +212,99 @@ def powerpoint_editor(
                 renderCanvas();
             }};
             document.getElementById('ppt-export-json').onclick = () => {{
-                let data = JSON.stringify(slides, null, 2);
-                let blob = new Blob([data], {{type:'application/json'}});
-                let url = URL.createObjectURL(blob);
-                let a = document.createElement('a');
-                a.href = url;
-                a.download = 'presentation.json';
-                a.click();
-                URL.revokeObjectURL(url);
+                try {{
+                    let data = JSON.stringify(slides, null, 2);
+                    let blob = new Blob([data], {{type:'application/json'}});
+                    let url = URL.createObjectURL(blob);
+                    let a = document.createElement('a');
+                    a.href = url;
+                    a.download = `presentation_${{new Date().toISOString().slice(0,19).replace(/:/g,'-')}}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    alert('Presentation exported as JSON successfully!');
+                }} catch (error) {{
+                    console.error('Error exporting JSON:', error);
+                    alert('Error exporting presentation. Please try again.');
+                }}
             }};
+            
+            document.getElementById('ppt-export-html').onclick = () => {{
+                try {{
+                    let htmlContent = generateHTMLPresentation(slides);
+                    let blob = new Blob([htmlContent], {{type:'text/html'}});
+                    let url = URL.createObjectURL(blob);
+                    let a = document.createElement('a');
+                    a.href = url;
+                    a.download = `presentation_${{new Date().toISOString().slice(0,19).replace(/:/g,'-')}}.html`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    alert('Presentation exported as HTML successfully!');
+                }} catch (error) {{
+                    console.error('Error exporting HTML:', error);
+                    alert('Error exporting presentation. Please try again.');
+                }}
+            }};
+            
+            function generateHTMLPresentation(slides) {{
+                let html = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Exported Presentation</title>
+    <style>
+        body {{ margin: 0; padding: 20px; font-family: Arial, sans-serif; background: #f0f0f0; }}
+        .slide {{ width: 800px; height: 600px; background: white; margin: 20px auto; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: relative; page-break-after: always; }}
+        .slide-title {{ font-size: 24px; font-weight: bold; margin-bottom: 20px; }}
+        .element {{ position: absolute; }}
+        .text-element {{ padding: 8px; }}
+        .image-element {{ background-size: cover; background-position: center; }}
+        .shape-element {{ }}
+        @media print {{ .slide {{ page-break-after: always; }} }}
+    </style>
+</head>
+<body>`;
+                
+                slides.forEach((slide, index) => {{
+                    html += `<div class="slide" style="background: ${{slide.background || '#ffffff'}}">`;
+                    html += `<div class="slide-title">Slide ${{index + 1}}: ${{slide.title || 'Untitled'}}</div>`;
+                    
+                    slide.elements.forEach(element => {{
+                        html += `<div class="element ${{element.type}}-element" style="`;
+                        html += `left: ${{element.x}}px; top: ${{element.y + 50}}px; `;
+                        html += `width: ${{element.width}}px; height: ${{element.height}}px; `;
+                        
+                        if (element.type === 'text') {{
+                            html += `font-size: ${{element.fontSize || 18}}px; `;
+                            html += `font-family: ${{element.fontFamily || 'Arial'}}; `;
+                            html += `color: ${{element.color || '#000000'}}; `;
+                            html += `font-weight: ${{element.bold ? 'bold' : 'normal'}}; `;
+                            html += `font-style: ${{element.italic ? 'italic' : 'normal'}}; `;
+                            html += `text-decoration: ${{element.underline ? 'underline' : 'none'}}; `;
+                            html += `">${{element.content || ''}}</div>`;
+                        }} else if (element.type === 'image' && element.src) {{
+                            html += `background-image: url(${{element.src}}); `;
+                            html += `"></div>`;
+                        }} else if (element.type === 'shape') {{
+                            html += `background-color: ${{element.color || '#3182ce'}}; `;
+                            if (element.shape === 'circle') {{
+                                html += `border-radius: 50%; `;
+                            }}
+                            html += `"></div>`;
+                        }}
+                    }});
+                    
+                    html += `</div>`;
+                }});
+                
+                html += `</body></html>`;
+                return html;
+            }}
             document.body.onclick = () => {{ selectedElement = null; renderCanvas(); }};
             window.addEventListener('resize', () => renderCanvas());
             renderSlides();
